@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Inertia from '@inertiajs/inertia';
+import Inertia from '@inertiajs/inertia-react';
 import { router } from '@inertiajs/react';
 
 const ListAccounts = ({
@@ -44,6 +44,7 @@ const ListAccounts = ({
 
         console.log('Label:', label);
         console.log('Secondary Class:', secondaryClass);
+        console.log('Class Card:', classCard);
     }, [type]);
 
     return (
@@ -157,19 +158,19 @@ const ListAccounts = ({
                  {/* Card de Total de Receitas */}
                 <div className="flex justify-center mt-12">
                     <div className={`bg-white shadow-lg rounded-lg p-6 w-full max-w-md ${classCard} text-white`}>
-                        <h2 className="text-2xl font-bold text-gray-100 mb-4">Total de {label}</h2>
+                        <h2 className="text-2xl font-bold text-gray-600 mb-4">Total de {label}</h2>
                         <div className="flex justify-between items-center">
-                            <span className="text-lg font-semibold text-gray-100">{label} Fixas:</span>
-                            <span className="text-lg font-bold text-gray-100">{formatCurrency(totalFixed)}</span>
+                            <span className="text-lg font-semibold text-gray-400">{label} Fixas:</span>
+                            <span className="text-lg font-bold text-gray-400">{formatCurrency(totalFixed)}</span>
                         </div>
                         <div className="flex justify-between items-center mt-2">
-                            <span className="text-lg font-semibold text-gray-100">{label} Variáveis:</span>
-                            <span className="text-lg font-bold text-gray-100">{formatCurrency(totalVariable)}</span>
+                            <span className="text-lg font-semibold text-gray-400">{label} Variáveis:</span>
+                            <span className="text-lg font-bold text-gray-400">{formatCurrency(totalVariable)}</span>
                         </div>
                         <hr className="my-4" />
                         <div className="flex justify-between items-center">
-                            <span className="text-xl font-bold text-gray-100">Total:</span>
-                            <span className="text-xl font-bold text-gray-100">{formatCurrency(totalFixed + totalVariable)}</span>
+                            <span className="text-xl font-bold text-gray-400">Total:</span>
+                            <span className="text-xl font-bold text-gray-400">{formatCurrency(totalFixed + totalVariable)}</span>
                         </div>
                     </div>
                 </div>

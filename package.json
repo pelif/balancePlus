@@ -16,9 +16,11 @@
     },
     "dependencies": {
         "@inertiajs/inertia-react": "^0.8.1",
-        "@inertiajs/react": "^2.0.2",
+        "@inertiajs/react": "^2.0.3",
         "@vitejs/plugin-react": "^4.3.4",
-        "react": "^19.0.0",
-        "react-dom": "^19.0.0"
+        "apexcharts": "^4.4.0",
+        "react": "^18.0.0",
+        "react-apexcharts": "^1.7.0",
+        "react-dom": "^18.0.0"
     }
 }

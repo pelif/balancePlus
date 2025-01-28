@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Inertia from '@inertiajs/inertia';
+import Inertia from '@inertiajs/inertia-react';
 import { router } from '@inertiajs/react';
 
 const FormAccounts = ({ categories, type, account: initialAccount }) => {
