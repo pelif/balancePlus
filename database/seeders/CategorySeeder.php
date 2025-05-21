@@ -12,7 +12,6 @@ use Illuminate\Support\Str;
 class CategorySeeder extends Seeder
 {
 
-
     /**
      * Run the database seeds.
      */
@@ -54,11 +53,15 @@ class CategorySeeder extends Seeder
             [
                 'id' => Str::uuid(),
                 'title' => 'Entretenimento'
+            ],
+            [
+                'id' => Str::uuid(),
+                'title' => 'Contrato'
             ]
         ];
 
         foreach ($categories as $category) {
-            Category::create($category);
+            Category::firstOrCreate($category);
         }
     }
 
