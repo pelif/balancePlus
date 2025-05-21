@@ -1,16 +1,15 @@
 import React from 'react';
-import Navbar from '../Components/NavBar';
+import NavBar from './NavBar';
+import Footer from './Footer';
 
 const AppLayout = ({ children }) => {
     return (
-        <div className="min-h-screen bg-gray-100">
-            {/* Navbar sempre visível */}
-            <Navbar />
-
-            {/* Conteúdo da página */}
-            <div className="p-4">
+        <div className="min-h-screen flex flex-col">
+            <NavBar />
+            <main className="flex-grow">
                 {children}
-            </div>
+            </main>
+            <Footer />
         </div>
     );
 };
