@@ -1,11 +1,14 @@
 <?php
 
 use App\Http\Controllers\AccountsController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/login', [AuthController::class, 'index'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::group(['prefix' => 'receitas'], function () {
     Route::get('/', [AccountsController::class, 'index'])->name('receitas');
