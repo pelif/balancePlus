@@ -21,6 +21,7 @@ class HomeController extends Controller
 
     public function index()
     {
+
         return Inertia::render('Home', [
             'totalRevenuesFixed' => (float) $this->accountsRepository->getTotalRevenuesFixed(),
             'totalRevenuesVariable' => (float) $this->accountsRepository->getTotalRevenuesVariable(),

@@ -10,7 +10,7 @@ const AuthLayout = ({ children }) => {
                             BalancePlus
                         </h1>
                         <p className="text-gray-600 mt-2 font-roboto text-lg leading-7">
-                           ✅ Controle de suas finanças pessoais e empresariais.
+                           💰 Controle de suas finanças pessoais e empresariais.
                         </p>
                         <p className="text-gray-600 mt-2 font-roboto text-lg leading-7 mt-10">
                            📈 Ferramentas para análise e mitigação de riscos em operações de renda variável.
@@ -21,8 +21,8 @@ const AuthLayout = ({ children }) => {
                     </div>
                 </div>
             </div>
-            <div className="p-8 flex justify-center items-center bg-gray-200 w-[40%] bg-opacity-70">
-                <div className="bg-opacity-100 w-full">
+            <div className="p-8 flex justify-center items-center bg-gray-200 w-[40%] bg-opacity-60">
+                <div className="bg-opacity-60 w-full">
                     {children}
                 </div>
             </div>

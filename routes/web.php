@@ -6,22 +6,23 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/login', [AuthController::class, 'index'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::get('/login', [AuthController::class, 'index'])->name('login.index');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('auth');
 
-Route::group(['prefix' => 'receitas'], function () {
+Route::group(['prefix' => 'receitas', 'middleware' => 'auth'], function () {
     Route::get('/', [AccountsController::class, 'index'])->name('receitas');
     Route::post('/', [AccountsController::class, 'store'])->name('store');
     Route::put('/{id}', [AccountsController::class, 'update'])->name('update');
 });
 
-Route::group(['prefix' => 'despesas'], function () {
+Route::group(['prefix' => 'despesas', 'middleware' => 'auth'], function () {
     Route::get('/', [AccountsController::class, 'index'])->name('despesas');
     Route::post('/', [AccountsController::class, 'store'])->name('store');
     Route::put('/{id}', [AccountsController::class, 'update'])->name('update');
 });
 
 Route::get('/welcome', function () {
-    return view('welcome');
+    return abort(404);
 });

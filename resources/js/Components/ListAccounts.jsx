@@ -172,8 +172,6 @@ const ListAccounts = ({
                         </div>
                     </div>
                 </div>
-
-
             </div>
     );
 };

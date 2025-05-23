@@ -19,6 +19,7 @@ class AccountsController extends Controller
 
     public function index()
     {
+
         return Inertia::render('Accounts', [
             'categories' => $this->categoryRepository->getAll(),
             'accountsFixed' => $this->accountsRepository->getAllFixed(),
