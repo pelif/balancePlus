@@ -46,6 +46,11 @@ class AccountsRepository implements AccountsRepositoryInterface
             ->get();
     }
 
+    public function destroy(string $id): bool
+    {
+        return $this->model::findOrFail($id)->delete();
+    }
+
     private function getTotalAccounts(int $type, bool $fixed): float
     {
         return $this->model::where('type', $type)
@@ -115,7 +120,12 @@ class AccountsRepository implements AccountsRepositoryInterface
     public function getTotalByCategoryWithName(): array
     {
         $categories = Category::all();
+        $result =  $this->splitTotalsByCategory($categories);
+        return $this->addCategoriesToResult($result);
+    }
 
+    private function splitTotalsByCategory(Collection $categories): array
+    {
         $result = [];
 
         foreach ($categories as $category) {
@@ -133,21 +143,19 @@ class AccountsRepository implements AccountsRepositoryInterface
             ];
         }
 
-        // Extraindo apenas as categorias como um array
-        $categoriesArray = array_map(fn ($item) => $item['category']  , $result);
-        $totalRevenuesFixed = array_map(fn ($item) => $item['revenuesFixed']  , $result);
-        $totalRevenuesVariable = array_map(fn ($item) => $item['revenuesVariable']  , $result);
-        $totalExpansesFixed = array_map(fn ($item) => $item['expansesFixed']  , $result);
-        $totalExpansesVariable = array_map(fn ($item) => $item['expansesVariable']  , $result);
-
-        // Adicionando o array de categorias ao resultado
-        $result['categories'] = $categoriesArray;
-        $result['revenuesFixed'] = $totalRevenuesFixed;
-        $result['revenuesVariable'] = $totalRevenuesVariable;
-        $result['expansesFixed'] = $totalExpansesFixed;
-        $result['expansesVariable'] = $totalExpansesVariable;
-
         return $result;
+    }
+
+    private function addCategoriesToResult(array $result): array
+    {
+        $transformed = [];
+        $transformed['categories'] = array_column($result, 'category');
+        $transformed['revenuesFixed'] = array_column($result, 'revenuesFixed');
+        $transformed['revenuesVariable'] = array_column($result, 'revenuesVariable');
+        $transformed['expansesFixed'] = array_column($result, 'expansesFixed');
+        $transformed['expansesVariable'] = array_column($result, 'expansesVariable');
+
+        return $transformed;
     }
 
     private function totalByCategory(string $categoryId, int $type, bool $fixed): float
@@ -157,4 +165,5 @@ class AccountsRepository implements AccountsRepositoryInterface
                     ->where('is_fixed', $fixed)
                     ->sum('value');
     }
+
 }

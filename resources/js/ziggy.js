@@ -1,0 +1,5 @@
+const Ziggy = {"url":"http:\/\/localhost","port":null,"defaults":{},"routes":{"login.index":{"uri":"login","methods":["GET","HEAD"]},"login.submit":{"uri":"login","methods":["POST"]},"logout":{"uri":"logout","methods":["POST"]},"home":{"uri":"\/","methods":["GET","HEAD"]},"receitas.index":{"uri":"receitas","methods":["GET","HEAD"]},"receitas.store":{"uri":"receitas","methods":["POST"]},"receitas.update":{"uri":"receitas\/{id}","methods":["PUT"],"parameters":["id"]},"receitas.destroy":{"uri":"receitas\/{id}","methods":["DELETE"],"parameters":["id"]},"despesas.index":{"uri":"despesas","methods":["GET","HEAD"]},"despesas.store":{"uri":"despesas","methods":["POST"]},"despesas.update":{"uri":"despesas\/{id}","methods":["PUT"],"parameters":["id"]},"despesas.destroy":{"uri":"despesas\/{id}","methods":["DELETE"],"parameters":["id"]},"storage.local":{"uri":"storage\/{path}","methods":["GET","HEAD"],"wheres":{"path":".*"},"parameters":["path"]}}};
+if (typeof window !== 'undefined' && typeof window.Ziggy !== 'undefined') {
+  Object.assign(Ziggy.routes, window.Ziggy.routes);
+}
+export { Ziggy };

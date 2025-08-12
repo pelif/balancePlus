@@ -33,13 +33,18 @@ class AccountsController extends Controller
     public function store(Request $request)
     {
         $this->accountsRepository->store($request->all());
-        return to_route($this->getContext());
+        return to_route($this->getContext().'.index');
     }
 
     public function update(string $id, Request $request)
     {
         $this->accountsRepository->update($id, $request->all());
-        return to_route($this->getContext());
+        return to_route($this->getContext().'.index');
+    }
+
+    public function destroy(string $id)
+    {
+        $this->accountsRepository->destroy($id);
     }
 
 

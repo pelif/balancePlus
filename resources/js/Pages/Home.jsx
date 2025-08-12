@@ -34,11 +34,14 @@ const Home = ({
             }
         }
     });
+
     const [revenuesFixedSeries] = useState(revenuesFixed);
     const [revenuesVariableSeries] = useState(revenuesVariable);
     const [expansesFixedSeries] = useState(expansesFixed);
     const [expansesVariableSeries] = useState(expansesVariable);
     const [labels] = useState(categories);
+
+    const liquidity = (totalRevenuesFixed + totalRevenuesVariable) - (totalExpansesFixed + totalExpansesVariable);
 
     return (
         <div className="container mx-auto p-4">
@@ -86,6 +89,12 @@ const Home = ({
                     </div>
                     <div className="grid grid-cols-1 gap-4 border-b p-2 items-center">
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalRevenuesVariable)}
+                    </div>
+                    <h2 className="text-4xl font-bold mt-6 mb-2">
+                       Liquidez
+                    </h2>
+                    <div className="grid grid-cols-1 gap-4 border-b p-2 items-center text-2xl font-bold text-green-700">
+                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(liquidity)}
                     </div>
                 </div>
 

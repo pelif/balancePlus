@@ -6,6 +6,7 @@ interface AccountsRepositoryInterface
 {
     public function getAllFixed();
     public function getAllVariable();
+    public function destroy(string $id): bool;
     public function getTotalFixed(): float;
     public function getTotalVariable(): float;
     public function store($data);

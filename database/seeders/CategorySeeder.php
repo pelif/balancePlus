@@ -57,6 +57,22 @@ class CategorySeeder extends Seeder
             [
                 'id' => Str::uuid(),
                 'title' => 'Contrato'
+            ],
+            [
+                'id' => Str::uuid(),
+                'title' => 'Automovel'
+            ],
+            [
+                'id' => Str::uuid(),
+                'title' => 'Saúde'
+            ],
+            [
+                'id' => Str::uuid(),
+                'title' => 'Serviços'
+            ],
+            [
+                'id' => Str::uuid(),
+                'title' => 'Outros'
             ]
         ];
 

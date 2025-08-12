@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth' => Authenticate::class,
         ]);
 
-        $middleware->redirectGuestsTo('login');
+        $middleware->redirectGuestsTo('login.index');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

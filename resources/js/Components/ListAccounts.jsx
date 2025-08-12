@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Inertia from '@inertiajs/inertia-react';
 import { router } from '@inertiajs/react';
+import ConfirmModal from './ConfirmModal';
 
 const ListAccounts = ({
     accountsFixed,
@@ -16,6 +16,10 @@ const ListAccounts = ({
     const [secondaryClass, setSecondaryClass] = useState('');
     const [classCard, setClassCard] = useState('');
 
+    // Estados para o modal de confirmação
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [accountToDelete, setAccountToDelete] = useState(null);
+
     console.log(type);
 
     const formatDate = (dateString) => {
@@ -27,9 +31,27 @@ const ListAccounts = ({
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
     };
 
-
     const handleDelete = (account) => {
-        console.log(account);
+        setAccountToDelete(account);
+        setIsModalOpen(true);
+    }
+
+    const confirmDelete = () => {
+        if (!accountToDelete) return;
+
+        const routeName = type === 1 ? 'receitas' : 'despesas';
+
+        router.delete(`/${routeName}/${accountToDelete.id}`, {
+            onSuccess: () => {
+                router.reload();
+                closeModal();
+            }
+        });
+    }
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setAccountToDelete(null);
     }
 
     useEffect(() => {
@@ -48,131 +70,142 @@ const ListAccounts = ({
     }, [type]);
 
     return (
+        <div className="container mx-auto p-4">
 
-            <div className="container mx-auto p-4">
+            {/* Contas Fixas */}
+            <div className={`grid gap-4 ${primaryClass} p-2 rounded-md text-white`}>
+                <div className="font-bold">{label} Fixas</div>
+            </div>
 
-                {/* Contas Fixas */}
-                <div className={`grid gap-4 ${primaryClass} p-2 rounded-md text-white`}>
-                    <div className="font-bold">{label} Fixas</div>
-                </div>
+            <div className="grid grid-cols-5 gap-4 bg-gray-100 p-2 rounded-md">
+                <div className="font-bold">Título</div>
+                <div className="font-bold">Data de Vencimento</div>
+                <div className="font-bold">Valor</div>
+                <div className="font-bold">Pago</div>
+                <div className="font-bold">Ações</div>
+            </div>
 
-                <div className="grid grid-cols-5 gap-4 bg-gray-100 p-2 rounded-md">
-                    <div className="font-bold">Título</div>
-                    <div className="font-bold">Data de Vencimento</div>
-                    <div className="font-bold">Valor</div>
-                    <div className="font-bold">Pago</div>
-                    <div className="font-bold">Ações</div>
-                </div>
+            {accountsFixed.length > 0 && accountsFixed.map((account, index) => (
+                <div className="grid grid-cols-5 gap-4 border-b p-2 items-center" key={index}>
+                    <div>{account.title}</div>
+                    <div>{formatDate(account.due_date)}</div>
+                    <div>{formatCurrency(account.value)}</div>
+                    <div>{account.is_paid ? 'Sim' : 'Não'}</div>
+                    <div className="flex space-x-2">
 
-                {accountsFixed.length > 0 && accountsFixed.map((account, index) => (
-                    <div className="grid grid-cols-5 gap-4 border-b p-2 items-center" key={index}>
-                        <div>{account.title}</div>
-                        <div>{formatDate(account.due_date)}</div>
-                        <div>{formatCurrency(account.value)}</div>
-                        <div>{account.is_paid ? 'Sim' : 'Não'}</div>
-                        <div className="flex space-x-2">
-
-                            <button
-                                className="text-green-500 hover:text-green-700"
-                                onClick={() => handleEdit(account)}>
-                                {/* Ícone de Editar (Lápis) */}
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                </svg>
-                            </button>
-                            <button
-                                className="text-red-500 hover:text-red-700"
-                                onClick={() => handleDelete(account)}>
-                                {/* Ícone de Excluir (Lixeira) */}
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </div>
+                        <button
+                            className="text-green-500 hover:text-green-700"
+                            onClick={() => handleEdit(account)}>
+                            {/* Ícone de Editar (Lápis) */}
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </button>
+                        <button
+                            className="text-red-500 hover:text-red-700"
+                            onClick={() => handleDelete(account)}>
+                            {/* Ícone de Excluir (Lixeira) */}
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
                     </div>
-                ))}
-
-                {/* Total Contas Fixas */}
-                <div className={`grid grid-cols-2 gap-4 ${primaryClass} p-2 rounded-md text-white`}>
-                    <div className="font-bold">Total {label} Fixas:</div>
-                    <div className='font-bold text-xl'>  {formatCurrency(totalFixed)}</div>
                 </div>
+            ))}
 
+            {/* Total Contas Fixas */}
+            <div className={`grid grid-cols-2 gap-4 ${primaryClass} p-2 rounded-md text-white`}>
+                <div className="font-bold">Total {label} Fixas:</div>
+                <div className='font-bold text-xl'>  {formatCurrency(totalFixed)}</div>
+            </div>
 
-                {/* Contas Variáveis */}
-                <div className={`grid gap-4 ${secondaryClass} p-2 rounded-md text-white mt-12`}>
-                    <div className="font-bold">{label} Variáveis</div>
-                </div>
+            {/* Contas Variáveis */}
+            <div className={`grid gap-4 ${secondaryClass} p-2 rounded-md text-white mt-12`}>
+                <div className="font-bold">{label} Variáveis</div>
+            </div>
 
-                <div className="grid grid-cols-5 gap-4 bg-gray-100 p-2 rounded-md">
-                    <div className="font-bold">Título</div>
-                    <div className="font-bold">Data de Vencimento</div>
-                    <div className="font-bold">Valor</div>
-                    <div className="font-bold">Pago</div>
-                    <div className="font-bold">Ações</div>
-                </div>
+            <div className="grid grid-cols-5 gap-4 bg-gray-100 p-2 rounded-md">
+                <div className="font-bold">Título</div>
+                <div className="font-bold">Data de Vencimento</div>
+                <div className="font-bold">Valor</div>
+                <div className="font-bold">Pago</div>
+                <div className="font-bold">Ações</div>
+            </div>
 
-                {accountsVariable.length > 0 && accountsVariable.map((account, index) => (
-                    <div className="grid grid-cols-5 gap-4 border-b p-2 items-center" key={index}>
-                        <div>{account.title}</div>
-                        <div>{formatDate(account.due_date)}</div>
-                        <div>{formatCurrency(account.value)}</div>
-                        <div>{account.is_paid ? 'Sim' : 'Não'}</div>
+            {accountsVariable.length > 0 && accountsVariable.map((account, index) => (
+                <div className="grid grid-cols-5 gap-4 border-b p-2 items-center" key={index}>
+                    <div>{account.title}</div>
+                    <div>{formatDate(account.due_date)}</div>
+                    <div>{formatCurrency(account.value)}</div>
+                    <div>{account.is_paid ? 'Sim' : 'Não'}</div>
 
-                        <div className="flex space-x-2">
-                            <button
-                                className="text-blue-500 hover:text-blue-700">
-                                {/* Ícone de Visualizar (Olho) */}
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12h.01M12 12h.01M9 12h.01M12 6.5c-3.5 0-6.5 2.5-6.5 5.5s3 5.5 6.5 5.5 6.5-2.5 6.5-5.5-3-5.5-6.5-5.5z" />
-                                </svg>
-                            </button>
-                            <button
-                                className="text-green-500 hover:text-green-700"
-                                onClick={() => handleEdit(account)}>
-                                {/* Ícone de Editar (Lápis) */}
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                </svg>
-                            </button>
-                            <button
-                                className="text-red-500 hover:text-red-700"
-                                onClick={() => handleDelete(account)}>
-                                {/* Ícone de Excluir (Lixeira) */}
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </div>
+                    <div className="flex space-x-2">
+                        <button
+                            className="text-blue-500 hover:text-blue-700">
+                            {/* Ícone de Visualizar (Olho) */}
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12h.01M12 12h.01M9 12h.01M12 6.5c-3.5 0-6.5 2.5-6.5 5.5s3 5.5 6.5 5.5 6.5-2.5 6.5-5.5-3-5.5-6.5-5.5z" />
+                            </svg>
+                        </button>
+                        <button
+                            className="text-green-500 hover:text-green-700"
+                            onClick={() => handleEdit(account)}>
+                            {/* Ícone de Editar (Lápis) */}
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </button>
+                        <button
+                            className="text-red-500 hover:text-red-700"
+                            onClick={() => handleDelete(account)}>
+                            {/* Ícone de Excluir (Lixeira) */}
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
                     </div>
-                ))}
-
-                {/* Total Contas Variáveis */}
-                <div className={`grid grid-cols-2 gap-4 ${secondaryClass} p-2 rounded-md text-white`}>
-                    <div className="font-bold">Total {label} Variáveis:</div>
-                    <div className='font-bold text-xl'>  {formatCurrency(totalVariable)}</div>
                 </div>
+            ))}
 
-                 {/* Card de Total de Receitas */}
-                <div className="flex justify-center mt-12">
-                    <div className={`bg-white shadow-lg rounded-lg p-6 w-full max-w-md ${classCard} text-white`}>
-                        <h2 className="text-2xl font-bold text-gray-600 mb-4">Total de {label}</h2>
-                        <div className="flex justify-between items-center">
-                            <span className="text-lg font-semibold text-gray-400">{label} Fixas:</span>
-                            <span className="text-lg font-bold text-gray-400">{formatCurrency(totalFixed)}</span>
-                        </div>
-                        <div className="flex justify-between items-center mt-2">
-                            <span className="text-lg font-semibold text-gray-400">{label} Variáveis:</span>
-                            <span className="text-lg font-bold text-gray-400">{formatCurrency(totalVariable)}</span>
-                        </div>
-                        <hr className="my-4" />
-                        <div className="flex justify-between items-center">
-                            <span className="text-xl font-bold text-gray-400">Total:</span>
-                            <span className="text-xl font-bold text-gray-400">{formatCurrency(totalFixed + totalVariable)}</span>
-                        </div>
+            {/* Total Contas Variáveis */}
+            <div className={`grid grid-cols-2 gap-4 ${secondaryClass} p-2 rounded-md text-white`}>
+                <div className="font-bold">Total {label} Variáveis:</div>
+                <div className='font-bold text-xl'>  {formatCurrency(totalVariable)}</div>
+            </div>
+
+            {/* Card de Total de Receitas */}
+            <div className="flex justify-center mt-12">
+                <div className={`bg-white shadow-lg rounded-lg p-6 w-full max-w-md ${classCard} text-white`}>
+                    <h2 className="text-2xl font-bold text-gray-600 mb-4">Total de {label}</h2>
+                    <div className="flex justify-between items-center">
+                        <span className="text-lg font-semibold text-gray-400">{label} Fixas:</span>
+                        <span className="text-lg font-bold text-gray-400">{formatCurrency(totalFixed)}</span>
+                    </div>
+                    <div className="flex justify-between items-center mt-2">
+                        <span className="text-lg font-semibold text-gray-400">{label} Variáveis:</span>
+                        <span className="text-lg font-bold text-gray-400">{formatCurrency(totalVariable)}</span>
+                    </div>
+                    <hr className="my-4" />
+                    <div className="flex justify-between items-center">
+                        <span className="text-xl font-bold text-gray-400">Total:</span>
+                        <span className="text-xl font-bold text-gray-400">{formatCurrency(totalFixed + totalVariable)}</span>
                     </div>
                 </div>
             </div>
+
+            {/* Modal de Confirmação */}
+            <ConfirmModal
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                onConfirm={confirmDelete}
+                title={`Confirmar Exclusão de ${label}`}
+                message={`Tem certeza que deseja excluir a ${label.toLowerCase()} "${accountToDelete?.title}"? Esta ação não pode ser desfeita.`}
+                confirmText="Excluir"
+                cancelText="Cancelar"
+                confirmButtonClass="bg-red-600 hover:bg-red-700"
+                cancelButtonClass="bg-gray-500 hover:bg-gray-600"
+            />
+        </div>
     );
 };
 

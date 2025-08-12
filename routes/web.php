@@ -12,15 +12,17 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('auth');
 
 Route::group(['prefix' => 'receitas', 'middleware' => 'auth'], function () {
-    Route::get('/', [AccountsController::class, 'index'])->name('receitas');
-    Route::post('/', [AccountsController::class, 'store'])->name('store');
-    Route::put('/{id}', [AccountsController::class, 'update'])->name('update');
+    Route::get('/', [AccountsController::class, 'index'])->name('receitas.index');
+    Route::post('/', [AccountsController::class, 'store'])->name('receitas.store');
+    Route::put('/{id}', [AccountsController::class, 'update'])->name('receitas.update');
+    Route::delete('/{id}', [AccountsController::class, 'destroy'])->name('receitas.destroy');
 });
 
 Route::group(['prefix' => 'despesas', 'middleware' => 'auth'], function () {
-    Route::get('/', [AccountsController::class, 'index'])->name('despesas');
-    Route::post('/', [AccountsController::class, 'store'])->name('store');
-    Route::put('/{id}', [AccountsController::class, 'update'])->name('update');
+    Route::get('/', [AccountsController::class, 'index'])->name('despesas.index');
+    Route::post('/', [AccountsController::class, 'store'])->name('despesas.store');
+    Route::put('/{id}', [AccountsController::class, 'update'])->name('despesas.update');
+    Route::delete('/{id}', [AccountsController::class, 'destroy'])->name('despesas.destroy');
 });
 
 Route::get('/welcome', function () {

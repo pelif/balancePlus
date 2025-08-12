@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import FormAccounts from '../Components/FormAccounts';
 import ListAccounts from '../Components/ListAccounts';
+import { router } from '@inertiajs/react';
 
 
-const Accounts = ({ categories, accountsFixed, accountsVariable, type, totalFixed, totalVariable }) => {
+const Accounts = ({
+    categories,
+    accountsFixed,
+    accountsVariable,
+    type,
+    totalFixed,
+    totalVariable,
+    handleDelete }) => {
 
     const [account, setAccount] = useState({
         title: '',
@@ -22,7 +30,7 @@ const Accounts = ({ categories, accountsFixed, accountsVariable, type, totalFixe
     }
 
     return (
-        <div className="flex flex-row gap-4">
+        <div className="flex flex-row gap-4 mt-5 mb-5">
             <div className="basis-1/3 shadow-md rounded-md p-4 bg-white">
                 <FormAccounts
                     categories={categories}
