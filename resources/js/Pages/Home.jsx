@@ -46,6 +46,57 @@ const Home = ({
     return (
         <div className="container mx-auto p-4">
             <div className="flex flex-wrap gap-4">
+
+                {/* Filtros de Data */}
+                {/* Filtros de Data */}
+                <div className="w-full shadow-md rounded-md p-4 bg-white mb-4">
+                    <h2 className="text-lg font-bold mb-4">Filtros de Data</h2>
+                    <form className="flex items-end gap-4">
+                        <div className="flex-1">
+                            <label htmlFor="initialDate" className="block text-sm font-medium text-gray-700 mb-1">
+                                Data Inicial:
+                            </label>
+                            <input
+                                type="date"
+                                id="initialDate"
+                                name="initialDate"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="flex-1">
+                            <label htmlFor="finalDate" className="block text-sm font-medium text-gray-700 mb-1">
+                                Data Final:
+                            </label>
+                            <input
+                                type="date"
+                                id="finalDate"
+                                name="finalDate"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                type="submit"
+                                className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                Filtrar
+                            </button>
+                            <button
+                                type="button"
+                                className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                                onClick={() => {
+                                    router.get('/', {
+                                        initialDate: '',
+                                        finalDate: ''
+                                    });
+                                }}
+                            >
+                                Limpar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
                 <div className="w-[calc(33.333%-1rem)] h-[400px] shadow-md rounded-md p-4 bg-white">
                     <div className='donut'>
                         <h1>Receitas Fixas por Categoria</h1>

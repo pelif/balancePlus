@@ -18,17 +18,17 @@ class AccountsRepository implements AccountsRepositoryInterface
 
     protected $model = Accounts::class;
 
-    public function getAllFixed(): Collection
+    public function getAllFixed(?string $initialDate = null, ?string $finalDate = null): Collection
     {
-        return $this->getAll(true);
+        return $this->getAll(true, $initialDate, $finalDate);
     }
 
-    public function getAllVariable(): Collection
+    public function getAllVariable(?string $initialDate = null, ?string $finalDate = null): Collection
     {
-        return $this->getAll(false);
+        return $this->getAll(false, $initialDate, $finalDate);
     }
 
-    private function getAll(bool $fixed): Collection
+    private function getAll(bool $fixed, ?string $initialDate = null, ?string $finalDate = null): Collection
     {
         $query = $this->model::query();
 
@@ -36,14 +36,39 @@ class AccountsRepository implements AccountsRepositoryInterface
             $query->where('type', $this->verifyType());
         }
 
-        return $query->where('is_fixed', $fixed)
-            ->whereBetween('created_at', [
+        $query->where('is_fixed', $fixed);
+
+        if ($initialDate && $finalDate && $this->isValidDate($initialDate) && $this->isValidDate($finalDate)) {
+            $startDate = \Carbon\Carbon::parse($initialDate)->startOfDay();
+            $endDate = \Carbon\Carbon::parse($finalDate)->endOfDay();
+
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        } elseif ($initialDate && $this->isValidDate($initialDate)) {
+            $query->where('created_at', '>=', \Carbon\Carbon::parse($initialDate)->startOfDay());
+        } elseif ($finalDate && $this->isValidDate($finalDate)) {
+            $query->where('created_at', '<=', \Carbon\Carbon::parse($finalDate)->endOfDay());
+        } else {
+            $query->whereBetween('created_at', [
                 \Carbon\Carbon::now()->startOfMonth()->startOfDay(),
                 \Carbon\Carbon::now()->endOfDay()
-            ])
-            ->with('category')
+            ]);
+        }
+
+        return $query->with('category')
             ->orderBy('created_at', 'desc')
             ->get();
+    }
+
+    private function isValidDate(?string $date): bool
+    {
+        if (!$date) return false;
+
+        try {
+            \Carbon\Carbon::parse($date);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function destroy(string $id): bool
@@ -82,7 +107,7 @@ class AccountsRepository implements AccountsRepositoryInterface
         return $this->getTotalAccounts(2, false);
     }
 
-    private function getTotal(bool $fixed): float
+    private function getTotal(bool $fixed, ?string $initialDate = null, ?string $finalDate = null): float
     {
         $query = $this->model::query();
 
@@ -90,23 +115,40 @@ class AccountsRepository implements AccountsRepositoryInterface
             $query->where('type', $this->verifyType());
         }
 
-        return $query->where('is_fixed', $fixed)->sum('value');
+        $query->where('is_fixed', $fixed);
+
+        if ($initialDate && $finalDate && $this->isValidDate($initialDate) && $this->isValidDate($finalDate)) {
+            $startDate = \Carbon\Carbon::parse($initialDate)->startOfDay();
+            $endDate = \Carbon\Carbon::parse($finalDate)->endOfDay();
+
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        } elseif ($initialDate && $this->isValidDate($initialDate)) {
+            $query->where('created_at', '>=', \Carbon\Carbon::parse($initialDate)->startOfDay());
+        } elseif ($finalDate && $this->isValidDate($finalDate)) {
+            $query->where('created_at', '<=', \Carbon\Carbon::parse($finalDate)->endOfDay());
+        } else {
+            $query->whereBetween('created_at', [
+                \Carbon\Carbon::now()->startOfMonth()->startOfDay(),
+                \Carbon\Carbon::now()->endOfDay()
+            ]);
+        }
+
+        return $query->sum('value');
     }
 
-    public function getTotalFixed(): float
+    public function getTotalFixed(?string $initialDate = null, ?string $finalDate = null): float
     {
-        return $this->getTotal(true);
+        return $this->getTotal(true, $initialDate, $finalDate);
     }
 
-    public function getTotalVariable(): float
+    public function getTotalVariable(?string $initialDate = null, ?string $finalDate = null): float
     {
-        return $this->getTotal(false);
+        return $this->getTotal(false, $initialDate, $finalDate);
     }
 
     public function store($data)
     {
         $data['user_id'] = User::first()->id;
-        $data['due_date'] = Carbon::parse($data['due_date'])->format('Y-m-d');
         return $this->model::create($data);
     }
 
@@ -117,22 +159,22 @@ class AccountsRepository implements AccountsRepositoryInterface
     }
 
 
-    public function getTotalByCategoryWithName(): array
+    public function getTotalByCategoryWithName(?string $initialDate = null, ?string $finalDate = null): array
     {
         $categories = Category::all();
-        $result =  $this->splitTotalsByCategory($categories);
+        $result =  $this->splitTotalsByCategory($categories, $initialDate, $finalDate);
         return $this->addCategoriesToResult($result);
     }
 
-    private function splitTotalsByCategory(Collection $categories): array
+    private function splitTotalsByCategory(Collection $categories, ?string $initialDate = null, ?string $finalDate = null): array
     {
         $result = [];
 
         foreach ($categories as $category) {
-            $totalRevenuesFixed = $this->totalByCategory($category->id, 1, true);
-            $totalRevenuesVariable = $this->totalByCategory($category->id, 1, false);
-            $totalExpansesFixed = $this->totalByCategory($category->id, 2, true);
-            $totalExpansesVariable = $this->totalByCategory($category->id, 2, false);
+            $totalRevenuesFixed = $this->totalByCategory($category->id, 1, true, $initialDate, $finalDate);
+            $totalRevenuesVariable = $this->totalByCategory($category->id, 1, false, $initialDate, $finalDate);
+            $totalExpansesFixed = $this->totalByCategory($category->id, 2, true, $initialDate, $finalDate);
+            $totalExpansesVariable = $this->totalByCategory($category->id, 2, false, $initialDate, $finalDate);
 
             $result[] = [
                 'category' => $category->title,
@@ -158,12 +200,26 @@ class AccountsRepository implements AccountsRepositoryInterface
         return $transformed;
     }
 
-    private function totalByCategory(string $categoryId, int $type, bool $fixed): float
+    private function totalByCategory(string $categoryId, int $type, bool $fixed, ?string $initialDate = null, ?string $finalDate = null): float
     {
-        return $this->model::where('category_id', $categoryId)
-                    ->where('type', $type)
-                    ->where('is_fixed', $fixed)
-                    ->sum('value');
+        $query = $this->model::query();
+
+        $query->where('category_id', $categoryId)
+            ->where('type', $type)
+            ->where('is_fixed', $fixed);
+
+        if ($initialDate && $finalDate && $this->isValidDate($initialDate) && $this->isValidDate($finalDate)) {
+            $startDate = \Carbon\Carbon::parse($initialDate)->startOfDay();
+            $endDate = \Carbon\Carbon::parse($finalDate)->endOfDay();
+
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        } elseif ($initialDate && $this->isValidDate($initialDate)) {
+            $query->where('created_at', '>=', \Carbon\Carbon::parse($initialDate)->startOfDay());
+        } elseif ($finalDate && $this->isValidDate($finalDate)) {
+            $query->where('created_at', '<=', \Carbon\Carbon::parse($finalDate)->endOfDay());
+        }
+
+        return $query->sum('value');
     }
 
 }

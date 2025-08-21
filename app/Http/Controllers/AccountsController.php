@@ -5,28 +5,43 @@ namespace App\Http\Controllers;
 use App\Repositories\CategoryRepositoryInterface;
 use App\Repositories\AccountsRepositoryInterface;
 use App\Traits\ContextIdentify;
+use App\Traits\FilterDates;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class AccountsController extends Controller
 {
-    use ContextIdentify;
+    use ContextIdentify, FilterDates;
 
     public function __construct(
         protected CategoryRepositoryInterface $categoryRepository,
         protected AccountsRepositoryInterface $accountsRepository
     ) {}
 
-    public function index()
+    public function index(?string $initialDate = null, ?string $finalDate = null)
     {
+        $dates = $this->filterDates($initialDate, $finalDate);
 
         return Inertia::render('Accounts', [
             'categories' => $this->categoryRepository->getAll(),
-            'accountsFixed' => $this->accountsRepository->getAllFixed(),
-            'accountsVariable' => $this->accountsRepository->getAllVariable(),
+            'accountsFixed' => $this->accountsRepository->getAllFixed(
+                $dates['initialDate'],
+                $dates['finalDate']
+            ),
+            'accountsVariable' => $this->accountsRepository->getAllVariable(
+                $dates['initialDate'],
+                $dates['finalDate']
+            ),
             'type' => $this->verifyType(),
-            'totalFixed' => (float) $this->accountsRepository->getTotalFixed(),
-            'totalVariable' => (float) $this->accountsRepository->getTotalVariable()
+            'totalFixed' => (float) $this->accountsRepository->getTotalFixed(
+                $dates['initialDate'],
+                $dates['finalDate']
+            ),
+            'totalVariable' => (float) $this->accountsRepository->getTotalVariable(
+                $dates['initialDate'],
+                $dates['finalDate']
+            ),
+            'filterDates' => $dates
         ]);
     }
 
